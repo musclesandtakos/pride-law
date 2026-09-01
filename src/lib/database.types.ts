@@ -429,26 +429,32 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           firm_id: string
           full_name: string | null
           id: string
           role: string
+          status: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          email?: string | null
           firm_id: string
           full_name?: string | null
           id: string
           role?: string
+          status?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          email?: string | null
           firm_id?: string
           full_name?: string | null
           id?: string
           role?: string
+          status?: string
           updated_at?: string
         }
         Relationships: [
@@ -583,7 +589,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_firm_admin: { Args: { target_firm: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -716,4 +722,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

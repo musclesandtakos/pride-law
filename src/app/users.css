@@ -1,0 +1,26 @@
+.modal-card select,
+td select {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  padding: 10px;
+}
+.page-error { margin-bottom: 12px; }
+.access-card { margin: 40px auto; max-width: 620px; }
+.access-card h1 { font: 700 25px Georgia; }
+.access-card p,
+.form-help { color: var(--muted); font-size: 12px; }
+.user-cell { align-items: center; display: flex; gap: 9px; }
+.user-cell .avatar { font-size: 10px; height: 30px; width: 30px; }
+.user-cell strong { align-items: center; display: flex; gap: 7px; }
+.user-cell small {
+  background: #e8f3ef;
+  border-radius: 5px;
+  color: var(--green);
+  font-size: 8px;
+  padding: 3px 5px;
+}
+.pill.pending { background: #fff7e7; color: #966b19; }
+button:disabled,
+select:disabled { cursor: not-allowed; opacity: .55; }
