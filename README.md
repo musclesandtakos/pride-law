@@ -11,6 +11,7 @@ An original, multi-tenant legal practice management platform built with Next.js,
 - Tasks and deadlines
 - Calendar events
 - Document metadata and private storage policies
+- Document template library with admin-managed .docx uploads and personalization fields
 - Time entries and invoices
 - Operational reporting
 - Immutable-style audit history
@@ -20,7 +21,7 @@ An original, multi-tenant legal practice management platform built with Next.js,
 
 1. Copy `.env.example` to `.env.local`.
 2. Create or select a Supabase project.
-3. Apply `supabase/migrations/202609010001_initial_legal_ops.sql`.
+3. Apply all SQL migrations in `supabase/migrations` in order.
 4. Add the project URL and publishable key to `.env.local`.
 5. Install and run:
 
