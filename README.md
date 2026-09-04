@@ -31,6 +31,7 @@ npm run dev
 ```
 
 Open http://localhost:3000. Create the first user in Supabase Auth; the first profile is assigned the admin role.
+For password recovery links, include `http://localhost:3000/auth/callback` (and your deployed `/auth/callback` URL) in Supabase Auth redirect URL allow-lists.
 
 ## Validation
 
@@ -68,4 +69,3 @@ Linear project: [Pride Law Case Management](https://linear.app/fuegogay/project/
 ## License
 
 Proprietary — Pride Law. All rights reserved.
-

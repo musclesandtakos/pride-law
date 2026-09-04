@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { login } from "./actions";
+import { requestPasswordReset } from "@/app/login/actions";
 
-export default async function Login({
+export default async function ForgotPassword({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -13,31 +13,26 @@ export default async function Login({
       <section className="login-brand">
         <div className="seal">P</div>
         <p>PRIDE LAW</p>
-        <h1>Run the firm with clarity.</h1>
-        <span>Secure case management for matters, clients, deadlines, documents, and billing.</span>
+        <h1>Reset your password.</h1>
+        <span>Enter your account email and we’ll send a secure recovery link.</span>
       </section>
       <section className="login-panel">
-        <form action={login} className="login-form">
-          <div className="eyebrow">FIRM OPERATIONS</div>
-          <h2>Welcome back</h2>
-          <p>Sign in with your authorized Pride Law account.</p>
+        <form action={requestPasswordReset} className="login-form">
+          <div className="eyebrow">ACCOUNT RECOVERY</div>
+          <h2>Forgot password</h2>
+          <p>Use your authorized Pride Law account email.</p>
           {error && <div className="error">{error}</div>}
           {message && <div className="notice">{message}</div>}
           <label>
             Email
             <input name="email" type="email" autoComplete="email" required />
           </label>
-          <label>
-            Password
-            <input name="password" type="password" autoComplete="current-password" required />
-          </label>
           <button className="primary" type="submit">
-            Sign in
+            Send reset link
           </button>
           <small>
-            <Link href="/forgot-password">Forgot your password?</Link>
+            <Link href="/login">Back to sign in</Link>
           </small>
-          <small>Protected by Supabase Auth and row-level security.</small>
         </form>
       </section>
     </main>
