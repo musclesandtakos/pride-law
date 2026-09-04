@@ -32,7 +32,7 @@ with check (firm_id = (select private.current_firm_id()) and public.is_firm_admi
 
 create policy document_templates_delete on public.document_templates
 for delete to authenticated
-using (firm_id = public.current_firm_id());
+using (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id));
 
 create trigger document_templates_touch
 before update on public.document_templates
