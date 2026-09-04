@@ -19,7 +19,7 @@ alter table public.document_templates enable row level security;
 
 create policy document_templates_select on public.document_templates
 for select to authenticated
-using (firm_id = public.current_firm_id());
+using (firm_id = (select private.current_firm_id()));
 
 create policy document_templates_insert on public.document_templates
 for insert to authenticated
