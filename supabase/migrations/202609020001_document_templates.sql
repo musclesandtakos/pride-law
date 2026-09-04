@@ -27,8 +27,8 @@ with check (firm_id = (select private.current_firm_id()) and public.is_firm_admi
 
 create policy document_templates_update on public.document_templates
 for update to authenticated
-using (firm_id = public.current_firm_id())
-with check (firm_id = public.current_firm_id());
+using (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id))
+with check (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id));
 
 create policy document_templates_delete on public.document_templates
 for delete to authenticated
