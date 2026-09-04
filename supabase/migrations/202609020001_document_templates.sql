@@ -27,12 +27,12 @@ with check (firm_id = (select private.current_firm_id()) and public.is_firm_admi
 
 create policy document_templates_update on public.document_templates
 for update to authenticated
-using (firm_id = public.current_firm_id())
-with check (firm_id = public.current_firm_id());
+using (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id))
+with check (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id));
 
 create policy document_templates_delete on public.document_templates
 for delete to authenticated
-using (firm_id = public.current_firm_id());
+using (firm_id = (select private.current_firm_id()) and public.is_firm_admin(firm_id));
 
 create trigger document_templates_touch
 before update on public.document_templates
@@ -50,19 +50,21 @@ create policy document_templates_bucket_select on storage.objects
 for select to authenticated
 using (
   bucket_id='document-templates'
-  and (storage.foldername(name))[1]=public.current_firm_id()::text
+  and (storage.foldername(name))[1]=(select private.current_firm_id())::text
 );
 
 create policy document_templates_bucket_insert on storage.objects
 for insert to authenticated
 with check (
   bucket_id='document-templates'
-  and (storage.foldername(name))[1]=public.current_firm_id()::text
+  and (storage.foldername(name))[1]=(select private.current_firm_id())::text
+  and public.is_firm_admin((select private.current_firm_id()))
 );
 
 create policy document_templates_bucket_delete on storage.objects
 for delete to authenticated
 using (
   bucket_id='document-templates'
-  and (storage.foldername(name))[1]=public.current_firm_id()::text
+  and (storage.foldername(name))[1]=(select private.current_firm_id())::text
+  and public.is_firm_admin((select private.current_firm_id()))
 );
