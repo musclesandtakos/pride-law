@@ -64,7 +64,7 @@ npm run build
 
 ## Deployment
 
-The repository is configured for Vercel and GitHub Actions. Add these GitHub repository secrets for optional CLI-driven Vercel jobs:
+The repository is configured for Vercel and GitHub Actions. The `Vercel Deploy` workflow builds and deploys preview environments for non-draft pull requests and production for pushes to `main` when these GitHub repository secrets are set:
 
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
@@ -76,7 +76,7 @@ Add these variables in Vercel for Preview and Production:
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY` (server-only; add only when a server workflow requires it)
 
-Vercel's native Git integration creates a preview URL for each pull request and deploys `main` to production.
+Link the Vercel project to the repository once so the CLI can pull project settings, then add the three GitHub secrets above. Pull request deployments are skipped for forks because GitHub does not expose repository secrets to forked pull_request runs.
 
 ## Security
 
