@@ -13,9 +13,13 @@ async function getProfile() {
   } = await supabase.auth.getUser();
   if (!user) return { supabase, error: Response.json({ error: "Unauthorized" }, { status: 401 }) };
 
-  const { data: profile } = await supabase.from("profiles").select("firm_id,role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("firm_id,role,status").eq("id", user.id).single();
   if (!profile?.firm_id) {
     return { supabase, error: Response.json({ error: "Your account is not assigned to a firm" }, { status: 403 }) };
+  }
+
+  if (profile.status !== "active") {
+    return { supabase, error: Response.json({ error: "Your account is not active" }, { status: 403 }) };
   }
 
   return { supabase, profile };
@@ -66,9 +70,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .select("id,name,description,category,placeholder_fields,sort_order,created_at,updated_at")
     .single();
 
-  return updated.error
-    ? Response.json({ error: updated.error.message }, { status: 400 })
-    : Response.json(updated.data);
+  return updated.error ? Response.json({ error: updated.error.message }, { status: 400 }) : Response.json(updated.data);
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -79,11 +81,7 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params;
-  const existing = await context.supabase
-    .from("document_templates")
-    .select("storage_path")
-    .eq("id", id)
-    .single();
+  const existing = await context.supabase.from("document_templates").select("storage_path").eq("id", id).single();
 
   if (existing.error) return Response.json({ error: existing.error.message }, { status: 404 });
 
@@ -91,7 +89,5 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
   if (removeObject.error) return Response.json({ error: removeObject.error.message }, { status: 400 });
 
   const removeRow = await context.supabase.from("document_templates").delete().eq("id", id);
-  return removeRow.error
-    ? Response.json({ error: removeRow.error.message }, { status: 400 })
-    : Response.json({ deleted: true });
+  return removeRow.error ? Response.json({ error: removeRow.error.message }, { status: 400 }) : Response.json({ deleted: true });
 }

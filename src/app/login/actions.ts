@@ -1,11 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getAppUrlOrigin } from "@/lib/auth/app-url";
 import { createClient } from "@/lib/supabase/server";
-
-function appUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-}
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -21,7 +18,7 @@ export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get("email") || "").trim();
   if (!email) redirect("/forgot-password?error=" + encodeURIComponent("Email is required"));
 
-  const redirectTo = `${appUrl().replace(/\/$/, "")}/auth/callback?next=/reset-password`;
+  const redirectTo = `${getAppUrlOrigin()}/auth/callback?flow=recovery&next=/reset-password`;
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
 
   if (error) redirect("/forgot-password?error=" + encodeURIComponent(error.message));
