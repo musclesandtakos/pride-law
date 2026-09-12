@@ -2,10 +2,29 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const APP_URL = (process.env.APP_URL || "http://localhost:3000").replace(/\/+$/, "");
-const REDIRECT_TO = `${APP_URL}/auth/callback`;
+const APP_URL = process.env.APP_URL;
 const DEFAULT_FIRM_ID = "00000000-0000-0000-0000-000000000001";
 const VALID_ROLES = new Set(["admin", "attorney", "staff", "billing", "readonly"]);
+
+function validateAppUrlOrigin(value) {
+  if (!value) return null;
+
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return null;
+  }
+
+  if ((parsed.protocol !== "http:" && parsed.protocol !== "https:") || parsed.username || parsed.password) {
+    return null;
+  }
+
+  return parsed.origin;
+}
+
+const APP_ORIGIN = validateAppUrlOrigin(APP_URL);
+const REDIRECT_TO = APP_ORIGIN ? `${APP_ORIGIN}/auth/callback?flow=invite` : null;
 
 const USERS = [
   { email: "mtzbmtz01@gmail.com", role: "admin" },
@@ -28,8 +47,10 @@ function isAlreadyExistsError(message) {
   return /already.*(registered|exists|been registered|in use)/i.test(message || "");
 }
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("Missing required env vars: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !APP_ORIGIN || !REDIRECT_TO) {
+  console.error(
+    "Missing or invalid env vars: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and APP_URL (http/https origin without credentials) are required",
+  );
   process.exit(1);
 }
 

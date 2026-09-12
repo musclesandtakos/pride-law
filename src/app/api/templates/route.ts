@@ -13,14 +13,14 @@ async function getProfile() {
   } = await supabase.auth.getUser();
   if (!user) return { supabase, error: Response.json({ error: "Unauthorized" }, { status: 401 }) };
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id,firm_id,role")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await supabase.from("profiles").select("id,firm_id,role,status").eq("id", user.id).single();
 
   if (!profile?.firm_id) {
     return { supabase, error: Response.json({ error: "Your account is not assigned to a firm" }, { status: 403 }) };
+  }
+
+  if (profile.status !== "active") {
+    return { supabase, error: Response.json({ error: "Your account is not active" }, { status: 403 }) };
   }
 
   return { supabase, profile };
@@ -36,9 +36,7 @@ export async function GET() {
     .order("sort_order")
     .order("created_at", { ascending: false });
 
-  return error
-    ? Response.json({ error: error.message }, { status: 400 })
-    : Response.json(data || []);
+  return error ? Response.json({ error: error.message }, { status: 400 }) : Response.json(data || []);
 }
 
 export async function POST(request: NextRequest) {
