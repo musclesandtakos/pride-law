@@ -71,6 +71,7 @@ The seed uses `APP_URL` for invite redirects and now points invites to `/auth/ca
 ## Authentication and status enforcement
 
 - Invitation callbacks and password-recovery callbacks are handled as separate flows.
+- Verified invitation callbacks continue to `/onboarding`, where the active user creates a password before signing in normally.
 - Recovery always continues to `/reset-password` and never activates profiles.
 - Invited users become active only when Supabase records their first email confirmation event.
 - Missing, invited, or disabled profiles are signed out and rejected from protected pages and APIs.

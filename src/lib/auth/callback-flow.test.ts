@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseEmailOtpType, resolveCallbackFlow } from "./callback-flow";
+import { callbackDestination, parseEmailOtpType, resolveCallbackFlow } from "./callback-flow";
 
 describe("parseEmailOtpType", () => {
   it("accepts only known OTP types", () => {
@@ -18,5 +18,17 @@ describe("resolveCallbackFlow", () => {
     expect(resolveCallbackFlow({ flow: "recovery", type: null })).toBe("recovery");
     expect(resolveCallbackFlow({ flow: null, type: "recovery" })).toBe("recovery");
     expect(resolveCallbackFlow({ flow: null, type: "signup" })).toBe("other");
+  });
+});
+
+describe("callbackDestination", () => {
+  it("keeps invitation and recovery destinations separate", () => {
+    expect(callbackDestination("invite", "/templates")).toBe("/onboarding");
+    expect(callbackDestination("recovery", "/templates")).toBe("/reset-password");
+  });
+
+  it("uses only safe internal destinations for other callbacks", () => {
+    expect(callbackDestination("other", "/templates?category=Forms")).toBe("/templates?category=Forms");
+    expect(callbackDestination("other", "https://evil.test")).toBe("/");
   });
 });

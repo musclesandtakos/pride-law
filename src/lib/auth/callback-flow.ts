@@ -1,4 +1,5 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { safeNextPath } from "./safe-next-path";
 
 const OTP_TYPES = ["signup", "invite", "magiclink", "recovery", "email_change", "email"] as const satisfies readonly EmailOtpType[];
 
@@ -13,4 +14,10 @@ export function resolveCallbackFlow(input: { flow: string | null; type: EmailOtp
   if (input.flow === "recovery" || input.type === "recovery") return "recovery" as CallbackFlow;
   if (input.flow === "invite" || input.type === "invite") return "invite" as CallbackFlow;
   return "other" as CallbackFlow;
+}
+
+export function callbackDestination(flow: CallbackFlow, next: string | null) {
+  if (flow === "recovery") return "/reset-password";
+  if (flow === "invite") return "/onboarding";
+  return safeNextPath(next);
 }

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveCallbackFlow, parseEmailOtpType } from "@/lib/auth/callback-flow";
-import { safeNextPath } from "@/lib/auth/safe-next-path";
+import { callbackDestination, resolveCallbackFlow, parseEmailOtpType } from "@/lib/auth/callback-flow";
 import { createClient } from "@/lib/supabase/server";
 
 function redirectToLogin(url: URL, message: string) {
@@ -13,7 +12,7 @@ export async function GET(request: Request) {
   const tokenHash = url.searchParams.get("token_hash");
   const type = parseEmailOtpType(url.searchParams.get("type"));
   const callbackFlow = resolveCallbackFlow({ flow: url.searchParams.get("flow"), type });
-  const next = callbackFlow === "recovery" ? "/reset-password" : safeNextPath(url.searchParams.get("next"));
+  const next = callbackDestination(callbackFlow, url.searchParams.get("next"));
   const supabase = await createClient();
 
   let userId: string | undefined;
