@@ -33,6 +33,8 @@ export async function updateSession(request: NextRequest) {
   const publicPath =
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
+    pathname.startsWith("/intake/") ||
+    pathname.startsWith("/api/public-intake/") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password");
 
