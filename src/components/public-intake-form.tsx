@@ -1,25 +1,80 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, LockKeyhole } from "lucide-react";
+import { CheckCircle2, FileUp, LockKeyhole } from "lucide-react";
 import { practiceAreas } from "@/lib/intake-fields";
+import { createIntakeUploadClient } from "@/lib/intake-upload-client";
+import { caseFileAccept, caseFileBucket, maxClientFiles, validateCaseFile } from "@/lib/file-uploads";
 
 type Props = {
   token: string;
+  linkId: string;
+  firmId: string;
   recipientName: string;
   recipientEmail: string;
   practiceArea: string | null;
 };
 
-export function PublicIntakeForm({ token, recipientName, recipientEmail, practiceArea }: Props) {
+export function PublicIntakeForm({ token, linkId, firmId, recipientName, recipientEmail, practiceArea }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [attachmentsUploaded, setAttachmentsUploaded] = useState(false);
 
   async function submit(formData: FormData) {
     setSubmitting(true);
     setError("");
+    const files = formData.getAll("supportingFiles").filter((value): value is File => value instanceof File && value.size > 0);
+    if (files.length > maxClientFiles) {
+      setError(`Please choose no more than ${maxClientFiles} files.`);
+      setSubmitting(false);
+      return;
+    }
+    const invalidFile = files.map(validateCaseFile).find(Boolean);
+    if (invalidFile) {
+      setError(invalidFile);
+      setSubmitting(false);
+      return;
+    }
+
+    if (files.length && !attachmentsUploaded) {
+      const supabase = await createIntakeUploadClient(token);
+      const paths = files.map((_, index) => `${firmId}/${linkId}/${index + 1}`);
+      const uploaded: string[] = [];
+      for (let index = 0; index < files.length; index += 1) {
+        const stored = await supabase.storage.from(caseFileBucket).upload(paths[index], files[index], {
+          contentType: files[index].type,
+          cacheControl: "3600",
+          upsert: false,
+        });
+        if (stored.error) {
+          if (uploaded.length) await supabase.storage.from(caseFileBucket).remove(uploaded);
+          setError("We could not upload the selected files. Please try again.");
+          setSubmitting(false);
+          return;
+        }
+        uploaded.push(paths[index]);
+      }
+      const attachmentRows = files.map((file, index) => ({
+        link_id: linkId,
+        firm_id: firmId,
+        storage_path: paths[index],
+        file_name: file.name,
+        mime_type: file.type,
+        file_size: file.size,
+      }));
+      const saved = await supabase.from("client_intake_attachments").insert(attachmentRows);
+      if (saved.error) {
+        await supabase.storage.from(caseFileBucket).remove(paths);
+        setError("We could not attach the selected files. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+      setAttachmentsUploaded(true);
+    }
+
     const payload: Record<string, FormDataEntryValue | boolean> = Object.fromEntries(formData);
+    delete payload.supportingFiles;
     payload.consentToContact = formData.get("consentToContact") === "on";
 
     const response = await fetch(`/api/public-intake/${token}`, {
@@ -62,6 +117,11 @@ export function PublicIntakeForm({ token, recipientName, recipientEmail, practic
       <label>ZIP code<input name="postalCode" autoComplete="postal-code"/></label>
       <label>Preferred contact *<select name="preferredContact" defaultValue="Email"><option>Email</option><option>Phone</option><option>Text</option></select></label>
     </div></fieldset>
+
+    <fieldset><legend>Supporting files</legend>
+      <label className="intake-file-drop"><FileUp size={24}/><span><strong>Add pictures or documents</strong><small>Optional · Up to 5 files, 10 MB each · JPG, PNG, HEIC, PDF, Word, Excel, or text</small></span><input name="supportingFiles" type="file" accept={caseFileAccept} multiple disabled={attachmentsUploaded}/></label>
+      {attachmentsUploaded && <p className="intake-uploaded"><CheckCircle2 size={15}/> Supporting files uploaded securely.</p>}
+    </fieldset>
 
     <fieldset><legend>About your legal matter</legend><div className="intake-form-grid">
       <label>Practice area *<select name="practiceArea" defaultValue={practiceArea || "Personal Injury"}>{practiceAreas.map((area) => <option key={area}>{area}</option>)}</select></label>
