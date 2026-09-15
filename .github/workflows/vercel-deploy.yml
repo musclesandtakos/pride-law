@@ -55,7 +55,7 @@ jobs:
           url="$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
-      - run: echo "Preview deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+      - run: 'echo "Preview deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"'
 
   production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -98,4 +98,4 @@ jobs:
           url="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
-      - run: echo "Production deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+      - run: 'echo "Production deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"'
