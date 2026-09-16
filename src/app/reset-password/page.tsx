@@ -3,9 +3,9 @@ import { updatePassword } from "./actions";
 export default async function ResetPassword({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; temporary?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, temporary } = await searchParams;
 
   return (
     <main className="login-shell">
@@ -17,9 +17,9 @@ export default async function ResetPassword({
       </section>
       <section className="login-panel">
         <form action={updatePassword} className="login-form">
-          <div className="eyebrow">ACCOUNT RECOVERY</div>
+          <div className="eyebrow">{temporary ? "TEMPORARY PASSWORD" : "ACCOUNT RECOVERY"}</div>
           <h2>Set new password</h2>
-          <p>Choose a strong password with at least 8 characters.</p>
+          <p>{temporary ? "Your temporary password must be replaced before you can continue." : "Choose a strong password with at least 8 characters."}</p>
           {error && <div className="error">{error}</div>}
           <label>
             New password

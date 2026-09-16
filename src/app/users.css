@@ -24,3 +24,14 @@ td select {
 .pill.pending { background: #fff7e7; color: #966b19; }
 button:disabled,
 select:disabled { cursor: not-allowed; opacity: .55; }
+.compact { padding: 7px 10px; white-space: nowrap; }
+.temporary-password-card output {
+  background: #f3f6f8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--navy, var(--ink));
+  font: 700 18px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+  padding: 14px;
+}
