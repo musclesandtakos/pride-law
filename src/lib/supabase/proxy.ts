@@ -43,7 +43,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user) {
-    const { data: profile } = await supabase.from("profiles").select("status").eq("id", user.id).maybeSingle();
+    const { data: profile } = await supabase.from("profiles")
+      .select("status,must_change_password,temporary_password_expires_at").eq("id", user.id).maybeSingle();
     const isActive = profile?.status === "active";
 
     if (!isActive && !publicPath) {
@@ -51,7 +52,21 @@ export async function updateSession(request: NextRequest) {
       return redirectWithCookies(response, new URL("/login?error=Account%20is%20not%20active", request.url));
     }
 
-    if (isActive && pathname === "/login") {
+    if (isActive && profile.must_change_password) {
+      const expiresAt = profile.temporary_password_expires_at
+        ? new Date(profile.temporary_password_expires_at).getTime()
+        : 0;
+      if (!expiresAt || expiresAt <= Date.now()) {
+        await supabase.auth.signOut();
+        return redirectWithCookies(response, new URL(
+          "/forgot-password?error=Temporary%20password%20expired.%20Request%20a%20reset%20link.",
+          request.url,
+        ));
+      }
+      if (!pathname.startsWith("/reset-password")) {
+        return redirectWithCookies(response, new URL("/reset-password?temporary=1", request.url));
+      }
+    } else if (isActive && pathname === "/login") {
       return redirectWithCookies(response, new URL("/", request.url));
     }
   }
