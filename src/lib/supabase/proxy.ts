@@ -35,6 +35,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.startsWith("/intake/") ||
     pathname.startsWith("/api/public-intake/") ||
+    pathname === "/api/health" ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password");
 
