@@ -28,9 +28,20 @@ Deno.serve(async (req) => {
   if (userError || !user) return json({ error: "Unauthorized" }, 401);
   const body = await req.json();
   const action = String(body.action || "");
-  const { data: actor } = await admin.from("profiles").select("firm_id,role,status").eq("id", user.id).single();
+  const { data: actor } = await admin.from("profiles")
+    .select("firm_id,role,status,must_change_password,temporary_password_expires_at").eq("id", user.id).single();
 
   if (req.method === "PATCH" && action === "complete-password-reset") {
+    const password = String(body.password || "");
+    if (password.length < 8) return json({ error: "Password must be at least 8 characters" }, 400);
+    if (actor?.must_change_password) {
+      const expiresAt = actor.temporary_password_expires_at
+        ? new Date(actor.temporary_password_expires_at).getTime()
+        : 0;
+      if (!expiresAt || expiresAt <= Date.now()) return json({ error: "Temporary password expired" }, 400);
+    }
+    const { error: passwordError } = await admin.auth.admin.updateUserById(user.id, { password });
+    if (passwordError) return json({ error: passwordError.message }, 400);
     const { error } = await admin.from("profiles").update({
       must_change_password: false,
       temporary_password_expires_at: null,
