@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { inviteUserIdempotently, type InviteProfile } from "./invite-user.ts";
 
 const roles = new Set(["admin", "attorney", "staff", "billing", "readonly"]);
 const json = (body: unknown, status = 200) => Response.json(body, { status });
@@ -58,12 +59,40 @@ Deno.serve(async (req) => {
     if (!/^\S+@\S+\.\S+$/.test(email) || !fullName) return json({ error: "Full name and a valid email are required" }, 400);
     const redirectTo = String(body.redirectTo || "");
     if (!/^https?:\/\//.test(redirectTo)) return json({ error: "Invalid invitation redirect" }, 400);
-    const { data: invited, error } = await admin.auth.admin.inviteUserByEmail(email, { data: { full_name: fullName }, redirectTo });
-    if (error || !invited.user) return json({ error: error?.message || "Unable to invite user" }, 400);
-    const { data: profile, error: updateError } = await admin.from("profiles").update({
-      firm_id: actor.firm_id, full_name: fullName, email, role: body.role, status: "invited"
-    }).eq("id", invited.user.id).select(profileFields).single();
-    return updateError ? json({ error: updateError.message }, 400) : json(profile, 201);
+
+    const findExistingProfile = async (): Promise<InviteProfile | null> => {
+      const { data, error } = await admin.from("profiles")
+        .select(profileFields)
+        .eq("firm_id", actor.firm_id)
+        .eq("email", email)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    };
+
+    const result = await inviteUserIdempotently({
+      findExistingProfile,
+      inviteUser: async () => {
+        const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
+          data: { full_name: fullName },
+          redirectTo,
+        });
+        if (error) console.error("[manage-users] invite failed", { actorId: user.id, error: error.message });
+        return { userId: data.user?.id || null, error: error?.message || null };
+      },
+      updateProfile: async (userId) => {
+        const { data, error } = await admin.from("profiles").update({
+          firm_id: actor.firm_id,
+          full_name: fullName,
+          email,
+          role: body.role,
+          status: "invited",
+        }).eq("id", userId).select(profileFields).single();
+        return { profile: data, error: error?.message || null };
+      },
+    });
+
+    return json(result.body, result.status);
   }
 
   const id = String(body.id || "");
