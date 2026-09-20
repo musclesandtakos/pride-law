@@ -109,7 +109,7 @@ export function TemplateAdmin({ initial }: { initial: Template[] }) {
           </label>
           <label className="wide">
             Additional placeholder fields (comma separated)
-            <input name="placeholderFields" placeholder="matter_number, hearing_date" />
+            <input name="placeholderFields" placeholder="client_dob, client_phone, incident_date, responsible_party, document_date" />
           </label>
           <label className="wide">
             Description
