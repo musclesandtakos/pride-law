@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isDocxFile, makeTemplateStoragePath, parseTemplateFields } from "@/lib/templates";
+import { isDocxFile, makeTemplateStoragePath, parseTemplateFields, withStandardNameFields } from "@/lib/templates";
 
 export const runtime = "edge";
 
@@ -32,7 +32,7 @@ export async function GET() {
 
   const { data, error } = await context.supabase
     .from("document_templates")
-    .select("id,name,description,category,placeholder_fields,sort_order,created_at,updated_at")
+    .select("id,name,description,category,subsection,placeholder_fields,sort_order,created_at,updated_at")
     .order("sort_order")
     .order("created_at", { ascending: false });
 
@@ -59,8 +59,9 @@ export async function POST(request: NextRequest) {
   const templateName = String(formData.get("name") || "").trim() || file.name.replace(/\.docx$/i, "");
   const description = String(formData.get("description") || "").trim() || null;
   const category = String(formData.get("category") || "").trim() || "General";
+  const subsection = String(formData.get("subsection") || "").trim() || "General forms";
   const sortOrder = Number(String(formData.get("sortOrder") || "0"));
-  const placeholderFields = parseTemplateFields(String(formData.get("placeholderFields") || ""));
+  const placeholderFields = withStandardNameFields(parseTemplateFields(String(formData.get("placeholderFields") || "")));
 
   const storagePath = makeTemplateStoragePath(context.profile.firm_id, file.name, crypto.randomUUID());
   const data = await file.arrayBuffer();
@@ -80,11 +81,12 @@ export async function POST(request: NextRequest) {
       name: templateName,
       description,
       category,
+      subsection,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       placeholder_fields: placeholderFields,
       storage_path: storagePath,
     })
-    .select("id,name,description,category,placeholder_fields,sort_order,created_at,updated_at")
+    .select("id,name,description,category,subsection,placeholder_fields,sort_order,created_at,updated_at")
     .single();
 
   if (record.error) {

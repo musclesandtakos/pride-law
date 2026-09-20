@@ -1,0 +1,2 @@
+alter table public.document_templates alter column placeholder_fields set default array['client_name','notary_name','attorney_name','witness_name']::text[];
+update public.document_templates set placeholder_fields=(select array_agg(field order by position) from (select field,min(position) as position from unnest(array['client_name','notary_name','attorney_name','witness_name']::text[]||placeholder_fields) with ordinality as values_with_position(field,position) group by field) deduplicated);

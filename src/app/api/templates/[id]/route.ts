@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { parseTemplateFields } from "@/lib/templates";
+import { parseTemplateFields, withStandardNameFields } from "@/lib/templates";
 
 export const runtime = "edge";
 
@@ -32,7 +32,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const template = await context.supabase
     .from("document_templates")
-    .select("id,name,description,category,placeholder_fields,sort_order,storage_path,updated_at")
+    .select("id,name,description,category,subsection,placeholder_fields,sort_order,storage_path,updated_at")
     .eq("id", id)
     .single();
 
@@ -59,15 +59,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (typeof body.name === "string") payload.name = body.name.trim();
   if (typeof body.description === "string") payload.description = body.description.trim() || null;
   if (typeof body.category === "string") payload.category = body.category.trim() || "General";
+  if (typeof body.subsection === "string") payload.subsection = body.subsection.trim() || "General forms";
   if (typeof body.sortOrder === "number") payload.sort_order = body.sortOrder;
-  if (typeof body.placeholderFields === "string") payload.placeholder_fields = parseTemplateFields(body.placeholderFields);
-  if (Array.isArray(body.placeholder_fields)) payload.placeholder_fields = body.placeholder_fields;
+  if (typeof body.placeholderFields === "string") payload.placeholder_fields = withStandardNameFields(parseTemplateFields(body.placeholderFields));
+  if (Array.isArray(body.placeholder_fields)) payload.placeholder_fields = withStandardNameFields(body.placeholder_fields.filter((field: unknown): field is string => typeof field === "string"));
 
   const updated = await context.supabase
     .from("document_templates")
     .update(payload)
     .eq("id", id)
-    .select("id,name,description,category,placeholder_fields,sort_order,created_at,updated_at")
+    .select("id,name,description,category,subsection,placeholder_fields,sort_order,created_at,updated_at")
     .single();
 
   return updated.error ? Response.json({ error: updated.error.message }, { status: 400 }) : Response.json(updated.data);

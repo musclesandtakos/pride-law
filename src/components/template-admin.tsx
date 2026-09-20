@@ -7,6 +7,7 @@ type Template = {
   name: string;
   description: string | null;
   category: string;
+  subsection: string;
   placeholder_fields: string[];
   sort_order: number;
   created_at: string;
@@ -95,16 +96,20 @@ export function TemplateAdmin({ initial }: { initial: Template[] }) {
             <input name="name" placeholder="Engagement Letter" />
           </label>
           <label>
-            Category
+            Section
             <input name="category" placeholder="Family Law" />
+          </label>
+          <label>
+            Subsection
+            <input name="subsection" placeholder="Client agreements" />
           </label>
           <label>
             Sort order
             <input name="sortOrder" type="number" defaultValue={0} min={0} />
           </label>
           <label className="wide">
-            Placeholder fields (comma separated)
-            <input name="placeholderFields" placeholder="client_name, matter_number, hearing_date" />
+            Additional placeholder fields (comma separated)
+            <input name="placeholderFields" placeholder="matter_number, hearing_date" />
           </label>
           <label className="wide">
             Description
@@ -147,6 +152,7 @@ function TemplateAdminCard({
   const [name, setName] = useState(template.name);
   const [description, setDescription] = useState(template.description || "");
   const [category, setCategory] = useState(template.category);
+  const [subsection, setSubsection] = useState(template.subsection);
   const [sortOrder, setSortOrder] = useState(String(template.sort_order));
   const [placeholderFields, setPlaceholderFields] = useState(template.placeholder_fields.join(", "));
 
@@ -157,8 +163,12 @@ function TemplateAdminCard({
         <input value={name} onChange={(event) => setName(event.target.value)} />
       </label>
       <label>
-        Category
+        Section
         <input value={category} onChange={(event) => setCategory(event.target.value)} />
+      </label>
+      <label>
+        Subsection
+        <input value={subsection} onChange={(event) => setSubsection(event.target.value)} />
       </label>
       <label>
         Sort order
@@ -181,6 +191,7 @@ function TemplateAdminCard({
               name,
               description,
               category,
+              subsection,
               sortOrder: Number(sortOrder || 0),
               placeholderFields,
             })
