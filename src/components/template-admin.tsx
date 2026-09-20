@@ -81,15 +81,15 @@ export function TemplateAdmin({ initial }: { initial: Template[] }) {
         <div>
           <span className="eyebrow">ADMIN TOOLS</span>
           <h1>Template manager</h1>
-          <p>Upload, organize, and retire .docx templates for the firm.</p>
+          <p>Upload, organize, and retire PDF or .docx templates for the firm.</p>
         </div>
       </div>
       <form id="template-upload-form" action={upload} className="card template-upload-form">
         <h2>Upload template</h2>
         <div className="template-form-grid">
           <label>
-            Template file (.docx)
-            <input type="file" name="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+            Template file (PDF or .docx)
+            <input type="file" name="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
           </label>
           <label>
             Display name
