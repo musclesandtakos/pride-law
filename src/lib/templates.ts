@@ -1,6 +1,7 @@
 export type UploadLike = { name: string; type?: string | null };
 
 const docxMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+export const standardNameFields = ["client_name", "notary_name", "attorney_name", "witness_name"] as const;
 
 export function parseTemplateFields(value: string) {
   return Array.from(
@@ -11,6 +12,10 @@ export function parseTemplateFields(value: string) {
         .filter(Boolean),
     ),
   );
+}
+
+export function withStandardNameFields(fields: string[]) {
+  return Array.from(new Set([...standardNameFields, ...fields]));
 }
 
 export function normalizeField(value: string) {

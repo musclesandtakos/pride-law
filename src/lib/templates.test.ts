@@ -5,6 +5,7 @@ import {
   makeTemplateStoragePath,
   parseTemplateFields,
   sanitizeFileName,
+  withStandardNameFields,
 } from "./templates";
 
 describe("template helpers", () => {
@@ -29,4 +30,5 @@ describe("template helpers", () => {
   it("humanizes field names", () => {
     expect(humanizeField("client_preferred_name")).toBe("Client Preferred Name");
   });
+  it("includes standard client and signer placeholders",()=>{expect(withStandardNameFields(["matter_number","client_name"])).toEqual(["client_name","notary_name","attorney_name","witness_name","matter_number"])});
 });

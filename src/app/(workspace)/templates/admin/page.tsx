@@ -23,7 +23,7 @@ export default async function TemplateAdminPage() {
 
   const templates = await supabase
     .from("document_templates")
-    .select("id,name,description,category,placeholder_fields,sort_order,created_at,updated_at")
+    .select("id,name,description,category,subsection,placeholder_fields,sort_order,created_at,updated_at")
     .order("sort_order")
     .order("created_at", { ascending: false });
 
