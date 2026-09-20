@@ -169,6 +169,7 @@ export type Database = {
           event_type: string | null
           firm_id: string
           id: string
+          intake_id: string | null
           location: string | null
           matter_id: string | null
           notes: string | null
@@ -182,6 +183,7 @@ export type Database = {
           event_type?: string | null
           firm_id: string
           id?: string
+          intake_id?: string | null
           location?: string | null
           matter_id?: string | null
           notes?: string | null
@@ -195,6 +197,7 @@ export type Database = {
           event_type?: string | null
           firm_id?: string
           id?: string
+          intake_id?: string | null
           location?: string | null
           matter_id?: string | null
           notes?: string | null
@@ -208,6 +211,13 @@ export type Database = {
             columns: ["firm_id"]
             isOneToOne: false
             referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_intake_id_fkey"
+            columns: ["intake_id"]
+            isOneToOne: false
+            referencedRelation: "intakes"
             referencedColumns: ["id"]
           },
           {
@@ -474,6 +484,7 @@ export type Database = {
           due_date: string | null
           firm_id: string
           id: string
+          intake_id: string | null
           matter_id: string | null
           notes: string | null
           priority: string
@@ -487,6 +498,7 @@ export type Database = {
           due_date?: string | null
           firm_id: string
           id?: string
+          intake_id?: string | null
           matter_id?: string | null
           notes?: string | null
           priority?: string
@@ -500,6 +512,7 @@ export type Database = {
           due_date?: string | null
           firm_id?: string
           id?: string
+          intake_id?: string | null
           matter_id?: string | null
           notes?: string | null
           priority?: string
@@ -513,6 +526,13 @@ export type Database = {
             columns: ["firm_id"]
             isOneToOne: false
             referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_intake_id_fkey"
+            columns: ["intake_id"]
+            isOneToOne: false
+            referencedRelation: "intakes"
             referencedColumns: ["id"]
           },
           {
@@ -590,6 +610,16 @@ export type Database = {
     }
     Functions: {
       is_firm_admin: { Args: { target_firm: string }; Returns: boolean }
+      schedule_intake_consultation: {
+        Args: {
+          p_ends_at: string
+          p_intake_id: string
+          p_location?: string | null
+          p_notes?: string | null
+          p_starts_at: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
