@@ -1,6 +1,7 @@
 "use client";
 
-import { Pencil, Plus, X } from "lucide-react";
+import Link from "next/link";
+import { MessageSquareText, Pencil, Plus, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ResourceField } from "@/lib/resources";
 
@@ -74,7 +75,7 @@ export function DataModule({ title, singular, resource, columns, labels, fields,
         <thead><tr>{columns.map((column) => <th key={column}>{labels[column] || column}</th>)}<th className="record-actions-heading">Actions</th></tr></thead>
         <tbody>{filtered.map((row) => <tr key={String(row.id)}>
           {columns.map((column) => <td key={column}>{format(row[column], column)}</td>)}
-          <td className="record-actions"><button className="edit-record-button" onClick={() => openEdit(row)} aria-label={`Edit ${String(row.name || singular)}`}><Pencil size={14}/> Edit</button></td>
+          <td className="record-actions">{resource === "clients" ? <Link className="client-communications-link" href={`/clients/${row.id}`} aria-label={`Open communications for ${String(row.name || singular)}`}><MessageSquareText size={14}/> Communications</Link> : null}<button className="edit-record-button" onClick={() => openEdit(row)} aria-label={`Edit ${String(row.name || singular)}`}><Pencil size={14}/> Edit</button></td>
         </tr>)}</tbody>
       </table>
     </div>
