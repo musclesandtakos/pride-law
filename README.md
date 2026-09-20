@@ -37,8 +37,18 @@ Required local env vars:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_APP_URL` (canonical app origin; must be an `http(s)` origin without embedded credentials)
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only; required for trusted integrations and admin operations)
+- `RINGCENTRAL_CLIENT_ID`
+- `RINGCENTRAL_CLIENT_SECRET`
+- `RINGCENTRAL_TOKEN_ENCRYPTION_KEY` (a long, random server-only secret)
+- `RINGCENTRAL_SERVER_URL` (optional; defaults to `https://platform.ringcentral.com`)
 
 `NEXT_PUBLIC_APP_URL` is normalized to its origin and required in production builds. Outside production, `http://localhost:3000` is the only fallback.
+
+For RingCentral, configure the OAuth redirect URI as
+`https://your-app.example/api/ringcentral/callback`. The app requests the signed-in
+extension's voice, SMS, phone-number, subscription, and recording permissions. Inbound
+sync is registered automatically after an administrator connects the account.
 
 ### Supabase auth callback allow-list
 

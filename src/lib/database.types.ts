@@ -58,6 +58,93 @@ export type Database = {
           },
         ]
       }
+      client_communications: {
+        Row: {
+          channel: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          duration_seconds: number | null
+          ended_at: string | null
+          firm_id: string
+          from_number: string | null
+          id: string
+          notes: string | null
+          recording_available: boolean
+          recording_id: string | null
+          ringcentral_id: string | null
+          ringcentral_session_id: string | null
+          started_at: string
+          status: string
+          subject: string | null
+          summary: string | null
+          to_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          firm_id: string
+          from_number?: string | null
+          id?: string
+          notes?: string | null
+          recording_available?: boolean
+          recording_id?: string | null
+          ringcentral_id?: string | null
+          ringcentral_session_id?: string | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          summary?: string | null
+          to_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          firm_id?: string
+          from_number?: string | null
+          id?: string
+          notes?: string | null
+          recording_available?: boolean
+          recording_id?: string | null
+          ringcentral_id?: string | null
+          ringcentral_session_id?: string | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          summary?: string | null
+          to_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_communications_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_communications_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string | null
@@ -472,6 +559,68 @@ export type Database = {
             foreignKeyName: "profiles_firm_id_fkey"
             columns: ["firm_id"]
             isOneToOne: false
+            referencedRelation: "firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ringcentral_connections: {
+        Row: {
+          account_id: string
+          connected_at: string
+          connected_by: string | null
+          encrypted_access_token: string
+          encrypted_refresh_token: string
+          extension_id: string
+          extension_name: string | null
+          firm_id: string
+          from_number: string | null
+          id: string
+          refresh_expires_at: string | null
+          token_expires_at: string
+          updated_at: string
+          webhook_secret_hash: string | null
+          webhook_subscription_id: string | null
+        }
+        Insert: {
+          account_id: string
+          connected_at?: string
+          connected_by?: string | null
+          encrypted_access_token: string
+          encrypted_refresh_token: string
+          extension_id: string
+          extension_name?: string | null
+          firm_id: string
+          from_number?: string | null
+          id?: string
+          refresh_expires_at?: string | null
+          token_expires_at: string
+          updated_at?: string
+          webhook_secret_hash?: string | null
+          webhook_subscription_id?: string | null
+        }
+        Update: {
+          account_id?: string
+          connected_at?: string
+          connected_by?: string | null
+          encrypted_access_token?: string
+          encrypted_refresh_token?: string
+          extension_id?: string
+          extension_name?: string | null
+          firm_id?: string
+          from_number?: string | null
+          id?: string
+          refresh_expires_at?: string | null
+          token_expires_at?: string
+          updated_at?: string
+          webhook_secret_hash?: string | null
+          webhook_subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ringcentral_connections_firm_id_fkey"
+            columns: ["firm_id"]
+            isOneToOne: true
             referencedRelation: "firms"
             referencedColumns: ["id"]
           },
