@@ -22,7 +22,7 @@ An original, multi-tenant legal practice management platform built with Next.js,
 This repository includes Supabase's [Supabase](https://github.com/supabase/agent-skills/tree/main/skills/supabase)
 and [Postgres best-practices](https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices)
 skills for GitHub Copilot. To refresh them from the upstream repository, run
-`npx skills update`.
+`npx skills update -y`.
 
 ## Local setup
 
