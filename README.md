@@ -17,6 +17,13 @@ An original, multi-tenant legal practice management platform built with Next.js,
 - Immutable-style audit history
 - Edge Function matter summaries
 
+## AI agent skills
+
+This repository includes Supabase's [Supabase](https://github.com/supabase/agent-skills/tree/main/skills/supabase)
+and [Postgres best-practices](https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices)
+skills for GitHub Copilot. To refresh them from the upstream repository, run
+`npx skills update`.
+
 ## Local setup
 
 1. Copy `.env.example` to `.env.local`.
