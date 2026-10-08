@@ -95,7 +95,7 @@ export function DocumentsModule({ initial, clients, matters, firmId, profileId, 
     <div className="page-head"><div><span className="eyebrow">SECURE FILES</span><h1>Documents</h1><p>Pictures and documents stored in private, firm-scoped storage.</p></div><button className="primary" onClick={() => setOpen(true)}><FileUp size={16}/> Upload files</button></div>
     <div className="file-security-note"><LockKeyhole size={16}/><span>Files are private. Access links expire after one hour and can only be created by authorized Pride Law staff.</span></div>
     <div className="toolbar"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter files…"/><span>{filtered.length} files</span></div>
-    <div className="document-grid">{filtered.map((row) => <article className="card document-card" key={row.id}>
+    <div className="document-grid">{filtered.map((row) => <article className="card document-card" key={row.id} id={`document-${row.id}`}>
       <div className="document-icon">{row.document_type?.toLowerCase().includes("photo") ? <ImageIcon/> : <FileUp/>}</div>
       <div><h2>{row.name}</h2><p>{row.document_type || "Document"} · {formatBytes(row.file_size)}</p></div>
       <dl><div><dt>Linked to</dt><dd>{row.client_id ? clientNames[row.client_id] : row.matter_id ? matterNames[row.matter_id] : "General firm file"}</dd></div><div><dt>Uploaded by</dt><dd>{row.owner_name || "Pride Law"}</dd></div></dl>

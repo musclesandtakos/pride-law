@@ -89,7 +89,7 @@ export function IntakeLinksModule({ initial }: { initial: IntakeLink[] }) {
       <table><thead><tr><th>Client</th><th>Practice area</th><th>Status</th><th>Expires</th><th>Created</th><th></th></tr></thead>
       <tbody>{links.length ? links.map((link) => {
         const status = statusFor(link);
-        return <tr key={link.id}>
+        return <tr key={link.id} id={`intake-link-${link.id}`}>
           <td><strong>{link.recipient_name}</strong><small className="table-subtext">{link.recipient_email}</small></td>
           <td>{link.practice_area || "—"}</td>
           <td><span className={`pill intake-status ${status.toLowerCase()}`}>{status}</span></td>

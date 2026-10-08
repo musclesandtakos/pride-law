@@ -157,7 +157,7 @@ export function WeeklyCalendar({ monday, today, days, events, intakes, canEdit }
     </div>
     <div className="card calendar-agenda">
       <h2>Appointments this week ({visibleEvents.length})</h2><p>All appointment times are listed here, including those outside the displayed hours.</p>
-      {visibleEvents.map((event) => <div className="calendar-agenda-row" key={event.id}>
+      {visibleEvents.map((event) => <div className="calendar-agenda-row" key={event.id} id={`event-${event.id}`}>
         <span>{event.starts_at ? dayLabel(firmDateTime(event.starts_at).slice(0, 10), { weekday: "short", month: "short", day: "numeric" }) : "Undated"}</span>
         {eventButton(event)}
       </div>)}

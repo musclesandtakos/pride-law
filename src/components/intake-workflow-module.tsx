@@ -44,15 +44,17 @@ export function IntakeWorkflowModule({
   initialIntakes,
   initialTasks,
   initialAppointments,
+  initialView = "attention",
 }: {
   initialIntakes: Intake[];
   initialTasks: FollowUp[];
   initialAppointments: Appointment[];
+  initialView?: View;
 }) {
   const [intakes, setIntakes] = useState(initialIntakes);
   const [tasks, setTasks] = useState(initialTasks);
   const [appointments, setAppointments] = useState(initialAppointments);
-  const [view, setView] = useState<View>("attention");
+  const [view, setView] = useState<View>(initialView);
   const [query, setQuery] = useState("");
   const [scheduleFor, setScheduleFor] = useState<Intake | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
