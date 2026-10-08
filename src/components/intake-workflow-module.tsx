@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FIRM_TIME_ZONE, firmDateTimeToIso } from "@/lib/calendar";
 import { useMemo, useState } from "react";
 import { CalendarPlus, CheckCircle2, Clock3, FileInput, Mail, Phone, Search, UserRound } from "lucide-react";
 
@@ -105,9 +106,11 @@ export function IntakeWorkflowModule({
   async function schedule(formData: FormData) {
     if (!scheduleFor) return;
     const localStart = String(formData.get("startsAt") || "");
-    const start = new Date(localStart);
-    if (!localStart || Number.isNaN(start.getTime())) {
-      setError("Choose a valid appointment date and time.");
+    let startsAt: string;
+    try {
+      startsAt = firmDateTimeToIso(localStart);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Choose a valid date and time.");
       return;
     }
 
@@ -117,7 +120,7 @@ export function IntakeWorkflowModule({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        startsAt: start.toISOString(),
+        startsAt,
         durationMinutes: Number(formData.get("durationMinutes")),
         location: String(formData.get("location") || ""),
         notes: String(formData.get("notes") || ""),
@@ -208,7 +211,7 @@ export function IntakeWorkflowModule({
         <div><span className="eyebrow">INITIAL CONSULTATION</span><h2 id="schedule-intake-title">Schedule {scheduleFor.name}</h2><p>This adds the appointment to the calendar and updates the intake automatically.</p></div>
         {error && <div className="error" role="alert">{error}</div>}
         <div className="schedule-form-grid">
-          <label className="wide">Date and time<input name="startsAt" type="datetime-local" required/></label>
+          <label className="wide">Date and time (Eastern)<input name="startsAt" type="datetime-local" required/></label>
           <label>Duration<select name="durationMinutes" defaultValue="30"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option><option value="90">90 minutes</option></select></label>
           <label>Location<select name="location" defaultValue="Phone"><option>Phone</option><option>Office</option><option>Video conference</option><option>Client location</option></select></label>
           <label className="wide">Notes<textarea name="notes" rows={3} placeholder="Anything the team should know before the consultation"/></label>
@@ -232,5 +235,5 @@ function formatDate(value: string) {
 }
 
 function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-US", { timeZone: FIRM_TIME_ZONE, month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(new Date(value));
 }

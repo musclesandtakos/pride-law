@@ -135,3 +135,11 @@ Linear project: [Pride Law Case Management](https://linear.app/fuegogay/project/
 ## License
 
 Proprietary — Pride Law. All rights reserved.
+
+## Weekly appointment calendar
+
+`/events` opens the current Monday–Sunday week in `America/New_York`. Staff can navigate weeks, return to this week, search appointments, refresh newly submitted intakes, or show all hours. The default grid shows 8 a.m.–6 p.m. in half-hour slots; the agenda includes appointments outside those hours.
+
+Choose **Schedule appointment** or a grid slot. **Client intake form** is the default source: selecting an intake supplies its name, email, phone, and practice area. Saving uses the existing `schedule_intake_consultation` RPC, which books or reschedules the upcoming initial consultation, updates the intake stage, and completes the follow-up task. **Manually entered by staff** collects attendee/contact details, appointment type, duration, location, and notes and saves an event through `/api/appointments`. Both endpoints require an active staff profile, and writes use the signed-in user's firm and existing RLS. Readonly accounts can view appointments.
+
+This change uses the existing events/intakes tables and the `20260920053822_connect_intake_follow_up_workflow.sql` migration; it requires no new schema migration. Dates entered in either scheduling form use Eastern Time regardless of browser timezone. Nonexistent or ambiguous times during a daylight saving transition are rejected with a message to choose another time.
