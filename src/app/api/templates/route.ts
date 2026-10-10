@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isDocxFile, makeTemplateStoragePath, parseTemplateFields, withStandardNameFields } from "@/lib/templates";
+import { isTemplateFile, makeTemplateStoragePath, parseTemplateFields, withStandardNameFields } from "@/lib/templates";
 
 export const runtime = "edge";
 
@@ -49,11 +49,11 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
-    return Response.json({ error: "Please choose a .docx template file" }, { status: 400 });
+    return Response.json({ error: "Please choose a .docx or .pdf template file" }, { status: 400 });
   }
 
-  if (!isDocxFile(file)) {
-    return Response.json({ error: "Only .docx templates are supported" }, { status: 400 });
+  if (!isTemplateFile(file)) {
+    return Response.json({ error: "Only .docx and .pdf templates are supported" }, { status: 400 });
   }
 
   const templateName = String(formData.get("name") || "").trim() || file.name.replace(/\.docx$/i, "");
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const upload = await context.supabase.storage.from(bucket).upload(storagePath, data, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type || "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    contentType: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
   });
 
   if (upload.error) return Response.json({ error: upload.error.message }, { status: 400 });
