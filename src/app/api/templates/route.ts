@@ -1,34 +1,20 @@
+import { formContext } from "@/lib/form-auth";
+import { inspectTemplate } from "@/lib/form-renderer";
+import { formFieldsSchema } from "@/lib/client-forms";
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { isDocxFile, makeTemplateStoragePath, parseTemplateFields, withStandardNameFields } from "@/lib/templates";
+import { makeTemplateStoragePath, parseTemplateFields, withStandardNameFields } from "@/lib/templates";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const bucket = "document-templates";
 
 async function getProfile() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { supabase, error: Response.json({ error: "Unauthorized" }, { status: 401 }) };
-
-  const { data: profile } = await supabase.from("profiles").select("id,firm_id,role,status").eq("id", user.id).single();
-
-  if (!profile?.firm_id) {
-    return { supabase, error: Response.json({ error: "Your account is not assigned to a firm" }, { status: 403 }) };
-  }
-
-  if (profile.status !== "active") {
-    return { supabase, error: Response.json({ error: "Your account is not active" }, { status: 403 }) };
-  }
-
-  return { supabase, profile };
+  return formContext();
 }
 
 export async function GET() {
   const context = await getProfile();
-  if ("error" in context) return context.error;
+  if (context.error) return context.error;
 
   const { data, error } = await context.supabase
     .from("document_templates")
@@ -41,7 +27,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const context = await getProfile();
-  if ("error" in context) return context.error;
+  if (context.error) return context.error;
   if (context.profile.role !== "admin") {
     return Response.json({ error: "Administrator access required" }, { status: 403 });
   }
@@ -49,12 +35,18 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
-    return Response.json({ error: "Please choose a .docx template file" }, { status: 400 });
+    return Response.json({ error: "Please choose a PDF, Word template, or legacy Word source" }, { status: 400 });
   }
 
-  if (!isDocxFile(file)) {
-    return Response.json({ error: "Only .docx templates are supported" }, { status: 400 });
+  const format = file.name.split(".").pop()?.toLowerCase();
+  if (!format || !["pdf","docx","doc"].includes(format) || file.size < 1 || file.size > 10*1024*1024) {
+    return Response.json({ error: "Choose a PDF or Word file smaller than 10 MB." }, { status: 400 });
   }
+  let fields;
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  try { fields = formFieldsSchema.parse(await inspectTemplate(bytes,format)); }
+  catch { return Response.json({error:"Unable to read template. Check the file and remove unsupported or payment-card fields before uploading."},{status:400}); }
+
 
   const templateName = String(formData.get("name") || "").trim() || file.name.replace(/\.docx$/i, "");
   const description = String(formData.get("description") || "").trim() || null;
@@ -64,7 +56,7 @@ export async function POST(request: NextRequest) {
   const placeholderFields = withStandardNameFields(parseTemplateFields(String(formData.get("placeholderFields") || "")));
 
   const storagePath = makeTemplateStoragePath(context.profile.firm_id, file.name, crypto.randomUUID());
-  const data = await file.arrayBuffer();
+  const data = bytes;
   const upload = await context.supabase.storage.from(bucket).upload(storagePath, data, {
     cacheControl: "3600",
     upsert: false,
@@ -77,7 +69,7 @@ export async function POST(request: NextRequest) {
     .from("document_templates")
     .insert({
       firm_id: context.profile.firm_id,
-      uploaded_by: context.profile.id,
+      uploaded_by: context.user.id,
       name: templateName,
       description,
       category,
@@ -85,6 +77,9 @@ export async function POST(request: NextRequest) {
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       placeholder_fields: placeholderFields,
       storage_path: storagePath,
+      file_format: format,
+      field_schema: fields,
+      review_status: "needs_review",
     })
     .select("id,name,description,category,subsection,placeholder_fields,sort_order,created_at,updated_at")
     .single();

@@ -19,7 +19,7 @@ export default async function ClientCommunicationsPage({ params, searchParams }:
   const { data: communications, error } = await query;
   if (error) throw new Error(error.message);
   const connection = ringCentralConfigured() ? await getConnectionForFirm(client.firm_id) : null;
-  return <>{selected.success && <div className="search-record-context">Search result · <Link href={`/clients/${id}`}>View recent communications</Link></div>}<ClientCommunications key={selected.success ? selected.data : id}
+  return <><div className="search-record-context"><Link href={`/templates/prepare?client=${id}`}>Open saved client forms</Link> · <Link href="/templates">Prepare new client forms</Link></div>{selected.success && <div className="search-record-context">Search result · <Link href={`/clients/${id}`}>View recent communications</Link></div>}<ClientCommunications key={selected.success ? selected.data : id}
     client={client}
     initialCommunications={communications || []}
     ringCentral={{ configured: ringCentralConfigured(), connected: Boolean(connection), fromNumber: connection?.from_number || null }}

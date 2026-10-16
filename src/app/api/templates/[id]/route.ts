@@ -1,33 +1,16 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { formContext } from "@/lib/form-auth";
 import { parseTemplateFields, withStandardNameFields } from "@/lib/templates";
 
 export const runtime = "edge";
 
 const bucket = "document-templates";
 
-async function getProfile() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { supabase, error: Response.json({ error: "Unauthorized" }, { status: 401 }) };
-
-  const { data: profile } = await supabase.from("profiles").select("firm_id,role,status").eq("id", user.id).single();
-  if (!profile?.firm_id) {
-    return { supabase, error: Response.json({ error: "Your account is not assigned to a firm" }, { status: 403 }) };
-  }
-
-  if (profile.status !== "active") {
-    return { supabase, error: Response.json({ error: "Your account is not active" }, { status: 403 }) };
-  }
-
-  return { supabase, profile };
-}
+async function getProfile() { return formContext(); }
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = await getProfile();
-  if ("error" in context) return context.error;
+  if (context.error) return context.error;
 
   const { id } = await params;
   const template = await context.supabase
@@ -47,7 +30,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = await getProfile();
-  if ("error" in context) return context.error;
+  if (context.error) return context.error;
   if (context.profile.role !== "admin") {
     return Response.json({ error: "Administrator access required" }, { status: 403 });
   }
@@ -76,7 +59,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = await getProfile();
-  if ("error" in context) return context.error;
+  if (context.error) return context.error;
   if (context.profile.role !== "admin") {
     return Response.json({ error: "Administrator access required" }, { status: 403 });
   }
@@ -86,9 +69,12 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
 
   if (existing.error) return Response.json({ error: existing.error.message }, { status: 404 });
 
-  const removeObject = await context.supabase.storage.from(bucket).remove([existing.data.storage_path]);
-  if (removeObject.error) return Response.json({ error: removeObject.error.message }, { status: 400 });
-
+  const used = await context.supabase.from("client_forms").select("id",{count:"exact",head:true}).eq("template_id",id);
+  if (used.error || used.count) return Response.json({error:"Templates used by client forms must be retained. Keep this template for its saved client copies."},{status:409});
+  // Delete the row first: the FK serializes this against concurrent client-form creation.
   const removeRow = await context.supabase.from("document_templates").delete().eq("id", id);
-  return removeRow.error ? Response.json({ error: removeRow.error.message }, { status: 400 }) : Response.json({ deleted: true });
+  if (removeRow.error) return Response.json({ error: "This template is still in use." }, { status: 409 });
+  const removeObject = await context.supabase.storage.from(bucket).remove([existing.data.storage_path]);
+  // An orphaned private source is safer than removing bytes a client snapshot still references.
+  return Response.json({ deleted: true, ...(removeObject.error ? {warning:"Template retired; private source cleanup is pending."} : {}) });
 }

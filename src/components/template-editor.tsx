@@ -43,7 +43,7 @@ export function TemplateEditor({
         </div>
         {downloadUrl && (
           <a className="primary" href={downloadUrl} target="_blank" rel="noreferrer">
-            Download .docx
+            Download source document
           </a>
         )}
       </div>
