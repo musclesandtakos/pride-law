@@ -6,3 +6,6 @@ coverage
 .vercel
 *.log
 *.tsbuildinfo
+# Private template source packs must never be committed.
+private-form-imports/
+supabase/.temp/

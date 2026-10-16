@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type Template = {
@@ -81,15 +82,15 @@ export function TemplateAdmin({ initial }: { initial: Template[] }) {
         <div>
           <span className="eyebrow">ADMIN TOOLS</span>
           <h1>Template manager</h1>
-          <p>Upload, organize, and retire .docx templates for the firm.</p>
+          <p>Upload PDF or Word templates, review source content, and map fields for client completion.</p>
         </div>
       </div>
-      <form id="template-upload-form" action={upload} className="card template-upload-form">
-        <h2>Upload template</h2>
+      <section className="card client-questionnaire"><h2>Review template fields</h2>{templates.map(template=><div className="prepared-form-row" key={template.id}><span>{template.name}</span><Link className="secondary" href={`/templates/${template.id}/mapping`}>Review and map fields</Link></div>)}</section><form id="template-upload-form" action={upload} className="card template-upload-form">
+        <h2>Upload template</h2><p>Every new file requires review before staff can use it. Legacy .doc files must be converted to .docx first. Remove previous client details and confirm Pride Law branding.</p>
         <div className="template-form-grid">
           <label>
-            Template file (.docx)
-            <input type="file" name="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+            Template file (PDF or Word)
+            <input type="file" name="file" accept=".pdf,.docx,.doc" required />
           </label>
           <label>
             Display name
