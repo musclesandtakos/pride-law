@@ -11,8 +11,8 @@ export default async function ForgotPassword({
   return (
     <main className="login-shell">
       <section className="login-brand">
-        <div className="seal">P</div>
-        <p>PRIDE LAW</p>
+        <div className="seal">W</div>
+        <p>WritRelay</p>
         <h1>Reset your password.</h1>
         <span>Enter your account email and we’ll send a secure recovery link.</span>
       </section>
@@ -20,7 +20,7 @@ export default async function ForgotPassword({
         <form action={requestPasswordReset} className="login-form">
           <div className="eyebrow">ACCOUNT RECOVERY</div>
           <h2>Forgot password</h2>
-          <p>Use your authorized Pride Law account email.</p>
+          <p>Use your authorized WritRelay account email.</p>
           {error && <div className="error">{error}</div>}
           {message && <div className="notice">{message}</div>}
           <label>

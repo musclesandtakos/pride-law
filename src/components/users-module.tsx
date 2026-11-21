@@ -28,7 +28,7 @@ export function UsersModule({initial,currentUserId}:{initial:Member[];currentUse
       if(!response.ok){setError(body.error||"Unable to send invitation");return}
       setMembers(value=>upsertMember(value,body));setOpen(false);
       setNotice(body.invitation_reused
-        ? `${body.email||"That email"} is already in the Pride Law workspace. No duplicate was created.`
+        ? `${body.email||"That email"} is already in the WritRelay workspace. No duplicate was created.`
         : `Invitation sent to ${body.email||"the new user"}.`);
     } catch {
       setError("The invitation could not be sent. Please check your connection and try again.");
@@ -53,7 +53,7 @@ export function UsersModule({initial,currentUserId}:{initial:Member[];currentUse
     setCredential({name:member.full_name||member.email||"User",password:body.temporaryPassword,expiresAt:body.expiresAt});
   }
   return <section className="page">
-    <div className="page-head"><div><span className="eyebrow">ACCESS CONTROL</span><h1>Users</h1><p>Invite Pride Law team members and control their workspace permissions.</p></div><button className="primary" onClick={()=>{setError("");setNotice("");setOpen(true)}}>＋ Invite user</button></div>
+    <div className="page-head"><div><span className="eyebrow">ACCESS CONTROL</span><h1>Users</h1><p>Invite firm team members and control their workspace permissions.</p></div><button className="primary" onClick={()=>{setError("");setNotice("");setOpen(true)}}>＋ Invite user</button></div>
     {error&&<div className="error page-error" role="alert">{error}</div>}
     {notice&&<div className="notice page-notice" aria-live="polite">{notice}</div>}
     <div className="toolbar"><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Search users…"/><span>{filtered.length} users</span></div>
