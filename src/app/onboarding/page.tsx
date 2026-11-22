@@ -40,8 +40,8 @@ export default async function Onboarding({
   return (
     <main className="login-shell">
       <section className="login-brand">
-        <div className="seal">P</div>
-        <p>PRIDE LAW</p>
+        <div className="seal">W</div>
+        <p>WritRelay</p>
         <h1>Welcome, {name}.</h1>
         <span>Your invitation is verified. Create a password to finish setting up your account.</span>
       </section>

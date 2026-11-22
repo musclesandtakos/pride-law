@@ -105,7 +105,7 @@ export function WeeklyCalendar({ monday, today, days, events, intakes, canEdit }
 
   return <section className="page calendar-page">
     <div className="page-head calendar-heading">
-      <div><span className="eyebrow">PRIDE LAW APPOINTMENTS</span><h1>Weekly calendar</h1>
+      <div><span className="eyebrow">WritRelay Appointments</span><h1>Weekly calendar</h1>
         <p>Start with the client intake, choose a time, and schedule. Staff can also enter appointments manually.</p></div>
       {canEdit && <button className="primary" onClick={() => openBooking()}><CalendarPlus size={16}/> Schedule appointment</button>}
     </div>

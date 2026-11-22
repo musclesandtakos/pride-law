@@ -1,4 +1,4 @@
-# Pride Law Case Management
+# WritRelay
 
 An original, multi-tenant legal practice management platform built with Next.js, Supabase, PostgreSQL, Linear, GitHub Actions, and Vercel.
 

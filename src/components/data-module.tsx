@@ -66,7 +66,7 @@ export function DataModule({ title, singular, resource, columns, labels, fields,
 
   return <section className="page">
     <div className="page-head">
-      <div><span className="eyebrow">PRIDE LAW OPERATIONS</span><h1>{title}</h1><p>Authorized firm records protected by row-level security.</p></div>
+      <div><span className="eyebrow">WritRelay Operations</span><h1>{title}</h1><p>Authorized firm records protected by row-level security.</p></div>
       <button className="primary" onClick={openCreate}><Plus size={16}/> Add {singular.toLowerCase()}</button>
     </div>
     <div className="toolbar"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Filter ${title.toLowerCase()}…`}/><span>{filtered.length} records</span></div>
