@@ -10,10 +10,10 @@ export default async function ResetPassword({
   return (
     <main className="login-shell">
       <section className="login-brand">
-        <div className="seal">P</div>
-        <p>PRIDE LAW</p>
+        <div className="seal">W</div>
+        <p>WritRelay</p>
         <h1>Create a new password.</h1>
-        <span>This secure update applies to your existing Pride Law account.</span>
+        <span>This secure update applies to your existing WritRelay account.</span>
       </section>
       <section className="login-panel">
         <form action={updatePassword} className="login-form">

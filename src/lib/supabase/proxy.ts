@@ -39,11 +39,11 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password");
 
-  if (!user && !publicPath) {
+  if ((!user || user.is_anonymous) && !publicPath) {
     return redirectWithCookies(response, new URL("/login", request.url));
   }
 
-  if (user) {
+  if (user && !user.is_anonymous) {
     const { data: profile } = await supabase.from("profiles")
       .select("status,must_change_password,temporary_password_expires_at").eq("id", user.id).maybeSingle();
     const isActive = profile?.status === "active";

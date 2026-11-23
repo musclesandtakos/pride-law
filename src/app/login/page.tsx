@@ -11,8 +11,8 @@ export default async function Login({
   return (
     <main className="login-shell">
       <section className="login-brand">
-        <div className="seal">P</div>
-        <p>PRIDE LAW</p>
+        <div className="seal">W</div>
+        <p>WritRelay</p>
         <h1>Run the firm with clarity.</h1>
         <span>Secure case management for matters, clients, deadlines, documents, and billing.</span>
       </section>
@@ -20,7 +20,7 @@ export default async function Login({
         <form action={login} className="login-form">
           <div className="eyebrow">FIRM OPERATIONS</div>
           <h2>Welcome back</h2>
-          <p>Sign in with your authorized Pride Law account.</p>
+          <p>Sign in with your authorized WritRelay account.</p>
           {error && <div className="error">{error}</div>}
           {message && <div className="notice">{message}</div>}
           <label>

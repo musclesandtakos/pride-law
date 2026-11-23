@@ -24,7 +24,7 @@ export function RingCentralSettings() {
   }
 
   return <section className="page integration-page">
-    <div className="page-head"><div><span className="eyebrow">FIRM INTEGRATIONS</span><h1>RingCentral</h1><p>Connect client calls and text messages to Pride Law records.</p></div></div>
+    <div className="page-head"><div><span className="eyebrow">FIRM INTEGRATIONS</span><h1>RingCentral</h1><p>Connect client calls and text messages to firm records.</p></div></div>
     {error && <div className="error" role="alert">{error}</div>}
     <div className="integration-layout">
       <div className="card integration-hero">

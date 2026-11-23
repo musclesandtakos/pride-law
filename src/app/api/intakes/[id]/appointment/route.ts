@@ -1,3 +1,4 @@
+import { canSchedule } from "@/lib/calendar";
 import { appointmentWindow, scheduleIntakeSchema } from "@/lib/intake-workflow";
 import { createClient } from "@/lib/supabase/server";
 
@@ -7,6 +8,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: profile } = await supabase.from("profiles").select("role,status").eq("id", user.id).maybeSingle();
+  if (!canSchedule(profile)) {
+    return Response.json({ error: "Only active firm staff can schedule appointments." }, { status: 403 });
+  }
 
   const parsed = scheduleIntakeSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

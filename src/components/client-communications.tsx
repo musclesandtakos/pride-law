@@ -79,7 +79,7 @@ export function ClientCommunications({ client, initialCommunications, ringCentra
 
       <div className="card communication-timeline">
         <div className="card-head"><div><span className="eyebrow">ACTIVITY</span><h2>Communication history</h2></div><span>{communications.length} items</span></div>
-        {!communications.length ? <div className="communications-empty"><MessageSquareText size={28}/><strong>No communications yet</strong><p>Calls, texts, notes, summaries, and recordings will appear here.</p></div> : communications.map((item) => <article className="communication-item" key={item.id}>
+        {!communications.length ? <div className="communications-empty"><MessageSquareText size={28}/><strong>No communications yet</strong><p>Calls, texts, notes, summaries, and recordings will appear here.</p></div> : communications.map((item) => <article className="communication-item" key={item.id} id={`communication-${item.id}`}>
           <div className={`communication-icon ${item.channel}`}>{item.channel === "call" ? <PhoneCall size={16}/> : item.channel === "sms" ? <MessageSquareText size={16}/> : <NotebookPen size={16}/>}</div>
           <div className="communication-body">
             <div><strong>{titleFor(item)}</strong><span className="communication-status">{item.status}</span><time>{new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.started_at))}</time></div>
