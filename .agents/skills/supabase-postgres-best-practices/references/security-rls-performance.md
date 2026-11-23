@@ -46,11 +46,14 @@ as $$
   );
 $$;
 
--- Revoke direct execution from public roles
-revoke execute on function private.is_team_member(bigint) from PUBLIC, anon, authenticated, service_role;
+-- Roles used by the policy must be allowed to call the helper
+revoke all on schema private from PUBLIC;
+grant usage on schema private to authenticated;
+grant execute on function private.is_team_member(bigint) to authenticated;
 
 -- Use in policy (indexed lookup, not per-row check)
 create policy team_orders_policy on orders
+  to authenticated
   using ((select private.is_team_member(team_id)));
 ```
 

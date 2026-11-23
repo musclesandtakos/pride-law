@@ -25,26 +25,28 @@ select * from orders;  -- Returns ALL orders
 -- Enable RLS on the table
 alter table orders enable row level security;
 
--- Create policy for users to see only their orders
+-- Supabase: use the authenticated JWT identity, which users cannot spoof
 create policy orders_user_policy on orders
   for all
-  using (user_id = current_setting('app.current_user_id')::bigint);
+  to authenticated
+  using (user_id = (select auth.uid()));
 
 -- Force RLS even for table owners
 alter table orders force row level security;
-
--- Set user context and query
-set app.current_user_id = '123';
-select * from orders;  -- Only returns orders for user 123
 ```
 
-Policy for authenticated role:
+If a non-Supabase deployment needs a custom `current_setting` identity, restrict
+that pattern to trusted middleware-only connections whose database role cannot
+set the value directly. Treat user-settable session GUCs as spoofable and do not
+use them as an authorization boundary.
+
+Policy for an authenticated role:
 
 ```sql
 create policy orders_user_policy on orders
   for all
   to authenticated
-  using (user_id = auth.uid());
+  using (user_id = (select auth.uid()));
 ```
 
 Reference: [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)

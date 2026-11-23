@@ -39,7 +39,9 @@ Check your driver settings:
 
 ```sql
 -- Many drivers use prepared statements by default
--- Node.js pg: { prepare: false } to disable
+-- Node.js pg (node-postgres) uses unnamed statements unless a query has a name;
+-- omit the name to keep it unnamed in transaction-mode pooling:
+-- client.query({ text: 'select $1::int', values: [1] })
 -- JDBC: prepareThreshold=0 to disable
 ```
 

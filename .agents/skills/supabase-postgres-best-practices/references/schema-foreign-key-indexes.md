@@ -45,14 +45,23 @@ Find missing FK indexes:
 
 ```sql
 select
-  conrelid::regclass as table_name,
-  a.attname as fk_column
+  c.conrelid::regclass as table_name,
+  c.conname as constraint_name
 from pg_constraint c
-join pg_attribute a on a.attrelid = c.conrelid and a.attnum = any(c.conkey)
 where c.contype = 'f'
   and not exists (
     select 1 from pg_index i
-    where i.indrelid = c.conrelid and a.attnum = any(i.indkey)
+    where i.indrelid = c.conrelid
+      and i.indisvalid
+      and i.indpred is null
+      and i.indexprs is null
+      and i.indnkeyatts >= cardinality(c.conkey)
+      and (
+        select array_agg(key.attnum order by key.ordinality)
+        from unnest(i.indkey::smallint[]) with ordinality
+          as key(attnum, ordinality)
+        where key.ordinality <= cardinality(c.conkey)
+      ) = c.conkey
   );
 ```
 
